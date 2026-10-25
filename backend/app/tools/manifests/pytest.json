@@ -1,0 +1,7 @@
+{
+  "name": "pytest",
+  "description": "Run Python tests in the current repository",
+  "adapter": "subprocess",
+  "command": ["pytest", "-q"],
+  "aliases": ["run tests", "unit tests", "pytest", "test suite"]
+}

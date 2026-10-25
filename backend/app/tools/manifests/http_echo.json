@@ -1,0 +1,8 @@
+{
+  "name": "http_echo",
+  "description": "Example HTTP tool adapter for external services",
+  "adapter": "http",
+  "method": "POST",
+  "url": "https://example.com/echo",
+  "aliases": ["call external api", "external tool", "webhook"]
+}

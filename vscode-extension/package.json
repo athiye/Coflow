@@ -1,0 +1,100 @@
+{
+  "name": "autonomous-swe-agent",
+  "displayName": "Autonomous SWE Agent",
+  "version": "0.0.8",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onCommand:autonomousSWE.askAgent",
+    "onCommand:autonomousSWE.runLiveUIWorkflow",
+    "onChatParticipant:autonomousSWE.chat"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "autonomousSWE.askAgent",
+        "title": "Autonomous SWE Agent: Ask Agent"
+      },
+      {
+        "command": "autonomousSWE.runLiveUIWorkflow",
+        "title": "Autonomous SWE Agent: Run Live UI Workflow"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "autonomousSWE.chat",
+        "name": "swe",
+        "fullName": "Autonomous SWE Agent",
+        "description": "SDLC-aware software engineering agent for architecture, brownfield change, release readiness, product analysis, and live UI workflows",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "architecture",
+            "description": "Explain the repo architecture and execution flow"
+          },
+          {
+            "name": "refactor",
+            "description": "Create a phased refactor plan without changing behavior"
+          },
+          {
+            "name": "impact",
+            "description": "Analyze brownfield change impact across modules and tests"
+          },
+          {
+            "name": "release",
+            "description": "Assess release readiness, rollback risk, and missing safeguards"
+          },
+          {
+            "name": "incident",
+            "description": "Identify likely production failure modes and mitigations"
+          },
+          {
+            "name": "security",
+            "description": "Review security risks, auth, validation, and unsafe defaults"
+          },
+          {
+            "name": "performance",
+            "description": "Review bottlenecks, hot paths, and scaling risks"
+          },
+          {
+            "name": "pm",
+            "description": "Analyze the repo like a product manager"
+          },
+          {
+            "name": "prd",
+            "description": "Turn a product requirement into architecture and implementation plan"
+          },
+          {
+            "name": "onboard",
+            "description": "Explain the codebase to a new engineer"
+          },
+          {
+            "name": "reverse-prd",
+            "description": "Generate a reverse PRD from the codebase"
+          }
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "Autonomous SWE Agent",
+      "properties": {
+        "autonomousSWE.backendUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8000",
+          "description": "Backend URL for the Autonomous SWE Agent"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.8.3"
+  }
+}

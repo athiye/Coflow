@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autonomous SWE Agent </title>
+  <style>
+    :root { color-scheme: light dark; --border:#25304f; --accent:#60a5fa; --muted:#94a3b8; }
+    * { box-sizing: border-box; }
+    body { font-family: Inter, Arial, sans-serif; max-width: 1460px; margin: 0 auto; padding: 22px; background: linear-gradient(180deg,#0b1020,#0b1228 35%,#0b1020); color:#e5e7eb; }
+    textarea,input,select { width: 100%; padding: 11px 12px; margin-top: 8px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: #e5e7eb; }
+    button { padding: 11px 16px; cursor: pointer; border-radius: 12px; border: 1px solid var(--border); background: var(--accent); color: #06111f; font-weight: 600; }
+    .page { display: grid; grid-template-columns: 390px 1fr; gap: 18px; align-items: start; }
+    .card { background: rgba(18,25,51,.92); border: 1px solid var(--border); border-radius: 18px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+    .muted { color: var(--muted); }
+    .section { margin-top: 14px; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .packs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .pill { border: 1px solid var(--border); border-radius: 999px; padding: 7px 11px; font-size: 12px; cursor: pointer; background: #0f172a; color: #e5e7eb; }
+    .pill.active { border-color: var(--accent); }
+    .actions { max-height: 76vh; overflow: auto; }
+    .action-item { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; cursor: pointer; background: rgba(15,23,42,.65); }
+    .action-item.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .action-title { font-weight: 700; margin-bottom: 4px; }
+    .action-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+    .toolbar > * { flex: 1; }
+    pre { white-space: pre-wrap; word-wrap: break-word; background: rgba(15,23,42,.6); border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-height: 44px; }
+    .hero { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:16px; }
+    .badge { font-size:12px; color:#cbd5e1; background: rgba(96,165,250,.12); border:1px solid rgba(96,165,250,.35); padding:6px 10px; border-radius:999px; }
+    .ui-box { border:1px solid var(--border); border-radius: 14px; padding: 14px; background: rgba(15,23,42,.45); }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div>
+      <h1>Autonomous SWE Agent </h1>
+      <p class="muted">Code intelligence plus live-UI workflow packs for release audits, reverse PRDs, incident reproduction, UX review, and brownfield flow mapping.</p>
+    </div>
+    <div class="badge">Workflow packs: Core • Brownfield • Release • Product • UI</div>
+  </div>
+
+  <div class="page">
+    <div class="card">
+      <h2>Workflow Packs</h2>
+      <div id="packFilters" class="packs"></div>
+      <div class="section actions">
+        <h3>Best-in-class Actions</h3>
+        <div id="actionList"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="result-grid">
+          <div>
+            <label>Backend URL</label>
+            <input id="baseUrl" value="http://127.0.0.1:8000" />
+          </div>
+          <div>
+            <label>Repository Path</label>
+            <input id="repoPath" placeholder="C:\\path\\to\\repo" />
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div>
+            <label>Selected Action</label>
+            <select id="actionSelect"></select>
+          </div>
+          <div>
+            <label>Route Preference</label>
+            <select id="routePreference">
+              <option value="auto">Auto</option>
+              <option value="cheap">Cheap</option>
+              <option value="mid">Mid</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section ui-box">
+          <strong>UI Automation / Computer Use</strong>
+          <div class="result-grid">
+            <div>
+              <label>Start URL</label>
+              <input id="startUrl" placeholder="https://staging.example.com" />
+            </div>
+            <div>
+              <label>App Name</label>
+              <input id="appName" placeholder="Staging App" />
+            </div>
+          </div>
+          <div class="result-grid-3">
+            <div>
+              <label>Max Steps</label>
+              <select id="maxSteps">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+		<option value="30">30</option>
+              </select>
+            </div>
+            <div>
+              <label>Provider</label>
+              <select id="computerProvider">
+                <option value="auto">Auto</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+              </select>
+            </div>
+            <div>
+              <label>Mode</label>
+              <select id="visionOnly">
+                <option value="false" selected>Interactive Browser</option>
+                <option value="true">Vision-first</option>
+              </select>
+            </div>
+          </div>
+          <div class="result-grid">
+            <div>
+              <label>Allow destructive actions</label>
+              <select id="allowDestructive">
+                <option value="false" selected>No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+            <div class="muted" style="padding-top:30px;">
+              Use these fields for live UI workflows like reverse PRD from live app, release audit, incident repro, and admin-console verification.
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <label>Prompt</label>
+          <textarea id="message" rows="8" placeholder="Choose an action or type your own prompt."></textarea>
+        </div>
+
+        <div class="toolbar">
+          <button id="runBtn">Run Agent</button>
+          <button id="clearBtn" style="background:#0f172a;color:#e5e7eb;">Clear</button>
+        </div>
+      </div>
+
+      <div id="result" class="card section" hidden>
+        <h2>Response</h2>
+        <div class="result-grid">
+          <div><strong>Route</strong><pre id="route"></pre></div>
+          <div><strong>Metrics</strong><pre id="metrics"></pre></div>
+        </div>
+        <div class="section"><strong>Plan</strong><pre id="plan"></pre></div>
+        <div class="section"><strong>Tool Calls</strong><pre id="tools"></pre></div>
+        <div class="section"><strong>Live Model Output</strong><pre id="tokens"></pre></div>
+        <div class="section"><strong>Patch Diff</strong><pre id="patches"></pre></div>
+        <div class="section"><strong>Answer</strong><pre id="answer"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const result = document.getElementById('result');
+    const actionSelect = document.getElementById('actionSelect');
+    const actionList = document.getElementById('actionList');
+    const packFilters = document.getElementById('packFilters');
+    const messageBox = document.getElementById('message');
+    const routePreference = document.getElementById('routePreference');
+    let actions = [];
+    let activePack = 'all';
+
+    function normalizeActions(raw) {
+      return (raw || []).map(action => ({
+        key: action.key,
+        title: action.title,
+        description: action.description,
+        pack: action.pack || 'core',
+        prompt_template: action.prompt_template || action.user_template || '',
+        system_instructions: action.system_instructions || '',
+        recommended_route: action.recommended_route || 'auto',
+      }));
+    }
+
+    async function loadActions() {
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+      try {
+        const response = await fetch(`${baseUrl}/api/actions`);
+        const data = await response.json();
+        actions = normalizeActions(data.actions);
+        renderPackFilters();
+        renderActions();
+      } catch (error) {
+        actionList.innerHTML = `<div class="muted">Failed to load actions: ${String(error)}</div>`;
+      }
+    }
+
+    function renderPackFilters() {
+      const packs = ['all', ...new Set(actions.map(a => a.pack))];
+      packFilters.innerHTML = '';
+      for (const pack of packs) {
+        const pill = document.createElement('button');
+        pill.className = 'pill' + (pack === activePack ? ' active' : '');
+        pill.textContent = pack === 'all' ? 'All' : pack.charAt(0).toUpperCase() + pack.slice(1);
+        pill.onclick = () => { activePack = pack; renderPackFilters(); renderActions(); };
+        packFilters.appendChild(pill);
+      }
+    }
+
+    function renderActions() {
+      const filtered = actions.filter(a => activePack === 'all' || a.pack === activePack);
+      actionSelect.innerHTML = '<option value="">Custom prompt</option>';
+      actionList.innerHTML = '';
+      for (const action of filtered) {
+        const option = document.createElement('option');
+        option.value = action.key;
+        option.textContent = `${action.title} (${action.recommended_route || 'auto'})`;
+        actionSelect.appendChild(option);
+
+        const card = document.createElement('div');
+        card.className = 'action-item';
+        card.dataset.key = action.key;
+        card.innerHTML = `
+          <div class="action-title">${action.title}</div>
+          <div>${action.description}</div>
+          <div class="action-meta">Pack: ${action.pack} • Suggested route: ${action.recommended_route || 'auto'}</div>
+          <div class="action-meta">Template: ${action.prompt_template || ''}</div>
+        `;
+        card.addEventListener('click', () => selectAction(action.key, true));
+        actionList.appendChild(card);
+      }
+    }
+
+    function selectAction(key, populateMessage) {
+      actionSelect.value = key;
+      document.querySelectorAll('.action-item').forEach(item => item.classList.toggle('active', item.dataset.key === key));
+      const selected = actions.find(item => item.key === key);
+      if (selected) {
+        if (populateMessage) messageBox.value = selected.prompt_template || '';
+        if (selected.recommended_route && selected.recommended_route !== 'auto') routePreference.value = selected.recommended_route;
+      }
+    }
+
+    actionSelect.addEventListener('change', () => {
+      const key = actionSelect.value;
+      if (!key) return;
+      selectAction(key, true);
+    });
+
+    document.getElementById('baseUrl').addEventListener('change', loadActions);
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      messageBox.value = '';
+      for (const id of ['route','metrics','plan','tools','tokens','patches','answer']) document.getElementById(id).textContent = '';
+      result.hidden = true;
+    });
+
+    document.getElementById('runBtn').addEventListener('click', async () => {
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+      const repoPath = document.getElementById('repoPath').value.trim();
+      const message = messageBox.value.trim();
+      const actionKey = actionSelect.value || null;
+      const startUrl = document.getElementById('startUrl').value.trim();
+      if (!message) return;
+
+      const computerUse = startUrl ? {
+        start_url: startUrl,
+        app_name: document.getElementById('appName').value.trim() || null,
+        max_steps: parseInt(document.getElementById('maxSteps').value, 10),
+        provider: document.getElementById('computerProvider').value,
+        vision_only: document.getElementById('visionOnly').value === 'true',
+        allow_destructive: document.getElementById('allowDestructive').value === 'true',
+	pause_for_manual_login: true,
+	pause_before_close: true,
+      } : null;
+
+      result.hidden = false;
+      for (const id of ['route','metrics','plan','tools','tokens','patches','answer']) document.getElementById(id).textContent = '';
+
+      try {
+        const response = await fetch(`${baseUrl}/api/chat/stream`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message,
+            action_key: actionKey,
+            repo_path: repoPath || null,
+            route_preference: routePreference.value || 'auto',
+            computer_use: computerUse,
+            client: 'web',
+            stream: true
+          })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let finalPayload = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const events = buffer.split('\n\n');
+          buffer = events.pop() || '';
+          for (const eventText of events) {
+            const line = eventText.split('\n').find(x => x.startsWith('data: '));
+            if (!line) continue;
+            const evt = JSON.parse(line.slice(6));
+            if (evt.type === 'route') document.getElementById('route').textContent = `${evt.data.route} via ${evt.data.provider} (${evt.data.model})`;
+            else if (evt.type === 'token') document.getElementById('tokens').textContent += evt.data;
+            else if (evt.type === 'plan') document.getElementById('plan').textContent = (evt.data || []).join('\n');
+            else if (evt.type === 'tool_calls') document.getElementById('tools').textContent = JSON.stringify(evt.data || [], null, 2);
+            else if (evt.type === 'patches') document.getElementById('patches').textContent = (evt.data || []).map(x => x.diff).join('\n\n');
+            else if (evt.type === 'final') finalPayload = evt.data;
+            else if (evt.type === 'error') document.getElementById('answer').textContent = String(evt.data);
+          }
+        }
+
+        if (finalPayload) {
+          document.getElementById('answer').textContent = finalPayload.answer || '';
+          document.getElementById('patches').textContent = (finalPayload.patches || []).map(x => x.diff).join('\n\n');
+          document.getElementById('metrics').textContent = JSON.stringify({
+            tool_count: (finalPayload.tool_calls || []).length,
+            patch_count: (finalPayload.patches || []).length,
+            action_key: actionKey,
+            route_preference: routePreference.value,
+            start_url: startUrl || null,
+          }, null, 2);
+        }
+      } catch (error) {
+        document.getElementById('answer').textContent = String(error);
+      }
+    });
+
+    loadActions();
+  </script>
+</body>
+</html>

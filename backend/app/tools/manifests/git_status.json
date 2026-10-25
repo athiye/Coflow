@@ -1,0 +1,7 @@
+{
+  "name": "git_status",
+  "description": "Show the current git working tree status",
+  "adapter": "subprocess",
+  "command": ["git", "status", "--short"],
+  "aliases": ["git status", "working tree", "changed files"]
+}
